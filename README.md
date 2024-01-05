@@ -2,6 +2,19 @@
 
 ## Structure
 
+This repository has three main components, MutaGen, the testbed and the orchestration framework.
+
+### [MutaGen](./mutagen)
+
+Contains the generator for mutation prone HTML fragments as well as some analysis tools.
+
+### [Testbed](./testbed)
+
+Contains the different sanitizer runner 
+
+### [Orchestration](./runner)
+
+Provides the environment to run your desired configuration neatly packages in a docker-compose project.
 
 ## Cite Us!
 

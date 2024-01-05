@@ -1,0 +1,441 @@
+version: '3.3'
+name: 'mxssy_dom'
+services:
+  database:
+    image: postgres:14
+    hostname: database
+    user: 1000:1000
+    command: "postgres -c 'config_file=/etc/postgresql/postgresql.conf'"
+    environment:
+      POSTGRES_DB: mxssy
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: ALLYOURMUTATIONS
+    shm_size: 4g
+    volumes:
+      - ./pgsetup/:/docker-entrypoint-initdb.d/
+      - ./pg.conf:/etc/postgresql/postgresql.conf
+      - /mnt/fastScratch/mxss_data/:/var/lib/postgresql/data/pgdata/
+    expose:
+            - 5432
+    ports:
+            - "127.0.0.1:5432:5432"
+  generator:
+    image: mxssy_gen
+    command: sh -c "/wait && /home/opam/mxssy/run_generate.sh -c7500"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  chrome-runner:
+    image: mxssy_run
+    command: sh -c "/wait && /usr/local/bin/node  -max-old-space-size=12098 --huge-max-old-generation-size run.js --browser=chromium"
+    restart: always
+    depends_on:
+      - database
+    shm_size: 2g
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  firefox-runner:
+    image: mxssy_run
+    command: sh -c "/wait && /usr/local/bin/node -max-old-space-size=12098 --huge-max-old-generation-size run.js --browser=firefox"
+    restart: always
+    depends_on:
+      - database
+    shm_size: 2g
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  webkit-runner:
+    image: mxssy_run
+    command: sh -c "/wait && /usr/local/bin/node -max-old-space-size=12098 --huge-max-old-generation-size run.js --browser=webkit"
+    restart: always
+    depends_on:
+      - database
+    shm_size: 2g
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-vanilla:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node -max-old-space-size=12098 --huge-max-old-generation-size sanitize.js --sanitizer=vanilla"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+
+  sanitize-typo3:
+    image: mxssy_php_sanitize
+    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-typo3-lax:
+    image: mxssy_php_sanitize
+    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-typo3-fix:
+    image: mxssy_php_fix_sanitize
+    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-typo3-fix-lax:
+    image: mxssy_php_fix_sanitize
+    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-typo3-fix2:
+    image: mxssy_php_fix2_sanitize
+    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix2"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-typo3-fix2-lax:
+    image: mxssy_php_fix2_sanitize
+    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix2-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-dompurify:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=dompurify"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-dompurify-lax:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=dompurifyLax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-dompurify-current:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=dompurifyCurrent"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-dompurify-current-lax:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=dompurifyLaxForceBodyCurrent"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-caja:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=caja"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_HOSTS: database:5432
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+    deploy:
+      replicas: 1
+  sanitize-caja2:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=caja2"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-sanitizehtml:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=sanitizehtml"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-sanitizehtml-curr:
+    image: mxssy_sanitize
+    command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=sanitizehtmlCurr"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-dotnet-htmlrule:
+    image: mxssy_dotnet_sanitize
+    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer html-rule"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-dotnet-htmlrule-lax:
+    image: mxssy_dotnet_sanitize
+    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer html-rule-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-dotnet-ganss:
+    image: mxssy_dotnet_sanitize
+    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer ganss"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-dotnet-ganss-lax:
+    image: mxssy_dotnet_sanitize
+    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer ganss-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-dotnet-ganss-fix:
+    image: mxssy_dotnet_sanitize
+    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer ganss-fix"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-dotnet-ganss-fix-lax:
+    image: mxssy_dotnet_sanitize
+    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer ganss-fix-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-ruby-sanitize:
+    image: mxssy_ruby_sanitize
+    command: sh -c "/wait && /usr/local/bin/ruby run.rb --sanitizer=ruby-sanitize"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-ruby-sanitize-relaxed:
+    image: mxssy_ruby_sanitize
+    command: sh -c "/wait && /usr/local/bin/ruby run.rb --sanitizer=ruby-sanitize-relaxed"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-ruby-sanitize-lax:
+    image: mxssy_ruby_sanitize
+    command: sh -c "/wait && /usr/local/bin/ruby run.rb --sanitizer=ruby-sanitize-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 0
+  sanitize-jsoup-basic:
+    image: mxssy_java_sanitize
+    command: sh -c "/wait && /usr/local/openjdk-11/bin/java -jar /work/app/build/libs/app.jar --sanitizer=jsoup-basic"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-jsoup-lax:
+    image: mxssy_java_sanitize
+    command: sh -c "/wait && /usr/local/openjdk-11/bin/java -jar /work/app/build/libs/app.jar --sanitizer=jsoup-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-antisamy:
+    image: mxssy_java_sanitize
+    command: sh -c "/wait && /usr/local/openjdk-11/bin/java -jar /work/app/build/libs/app.jar --sanitizer=antisamy"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
+  sanitize-antisamy-lax:
+    image: mxssy_java_sanitize
+    command: sh -c "/wait && /usr/local/openjdk-11/bin/java -jar /work/app/build/libs/app.jar --sanitizer=antisamy-lax"
+    restart: always
+    depends_on:
+      - database
+    environment:
+      WAIT_LOGGER_LEVEL: error
+      WAIT_BEFORE: 60
+      WAIT_AFTER: 15
+      WAIT_HOSTS: database:5432
+    deploy:
+      replicas: 1
