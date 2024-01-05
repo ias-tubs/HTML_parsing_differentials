@@ -43,6 +43,37 @@ Lastly, the compose file has an entry for each sanitizer we ran during our study
 - Observe: `docker compose -f sanitizer_with_dom_export.yml logs -f`
 - Stop: `docker compose -f sanitizer_with_dom_export.yml down`
 
-## Environment
+## Analyzing the results
 
-This starts a postgres database which expects to sta
+When running this project, the database is exposed to localhost:5432. You can use a suitable SQL client to start retrieving and analyzing data.
+Here, it might be helpful to *only* start the database to keep system load during complex queries in check. To this end, stop the project as outlined above and run: `docker compose -f sanitizer_with_dom_export.yml up database -d`.
+
+### Useful queries
+
+Some useful SQL queries to select data and become familiar with the schema.
+
+- How many samples were executed per sanitizer (i.e., which sanitizers are vulnerable?)
+
+```sql
+select s.name, count(distinct e.gen_id) from evaluations e join sanitizers s on s.id = e.sanitizer_id where executed = 1 group by s.name;
+```
+
+- Select samples bypassing a specific sanitizer
+
+```sql
+select g.id, s2.name, b.name, m.name, g.payload, s.output, s.serialized, e.result, e.serialized from evaluations e join modes m on e.mode_id = m.id join sanitized s on e.sanitized_id = s.id join sanitizers s2 on s2.id = s.sanitizer_id join generations g on e.gen_id = g.id join browsers b on e.browser_id = b.id where e.executed = 1 and s2.name = 'typo3' order by e.gen_id;
+
+```
+- Progress of the sanitizer/evaluation queues
+
+The system uses two tables to "queue" samples for further evaluation. For each generated sample, MutaGen inserts an entry for every sanitizer known to the system into the `to_sanitize` table.
+Similarly, after sanitizing a payload, the sanitizer does the same for each pair of browser and parsing mode for the `to_evaluate` table.
+
+```sql
+select 'sanitize' as kind, 'done' as name, count(*) as count from to_sanitize where sanitized_id is not null union
+select 'sanitize' as kind, 'open' as name, count(*) as count from to_sanitize where sanitized_id is  null union
+select 'eval' as kind, 'done' as name, count(*) as count from to_evaluate where to_evaluate.eval_id is not null union
+select 'eval' as kind, 'open' as name, count(*) as count from to_evaluate where to_evaluate.eval_id is null order by kind, name;
+```
+
+This queries how many open and finished entries are in both queues. The project runs a background process to continuously remove finished items from both queues, to avoid having them clog up the queue.
