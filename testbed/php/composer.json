@@ -1,0 +1,6 @@
+{
+    "require": {
+        "typo3/html-sanitizer": "^2.0.16",
+        "ext-pdo": "*"
+    }
+}
