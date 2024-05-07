@@ -1,0 +1,9 @@
+FROM ruby:3.0
+WORKDIR /work
+COPY Gemfile .
+RUN bundle install
+COPY *.rb .
+RUN bundle list
+
+
+CMD /usr/local/bin/ruby test.rb

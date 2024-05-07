@@ -1,0 +1,27 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    crass (1.0.6)
+    loofah (2.19.0)
+      crass (>= 1.0.2)
+      nokogiri (>= 1.5.9)
+    mini_portile2 (2.8.0)
+    nokogiri (1.13.9)
+      mini_portile2 (>= 2.8.0)
+      racc (>= 1.4)
+    pg (1.4.5)
+    racc (1.6.0)
+    sanitize (6.0.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  loofah
+  pg
+  sanitize
+
+BUNDLED WITH
+   2.4.1
