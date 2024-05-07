@@ -1,0 +1,62 @@
+diff --git a/node_modules/sanitizehtml-curr/index.js b/node_modules/sanitizehtml-curr/index.js
+index b834977..889741f 100644
+--- a/node_modules/sanitizehtml-curr/index.js
++++ b/node_modules/sanitizehtml-curr/index.js
+@@ -216,8 +216,7 @@ function sanitizeHtml(html, options, _recursing) {
+   let addedText = false;
+ 
+   initializeState();
+-
+-  const parser = new htmlparser.Parser({
++  let handler = {
+     onopentag: function(name, attribs) {
+       // If `enforceHtmlBoundary` is `true` and this has found the opening
+       // `html` tag, reset the state.
+@@ -596,7 +595,46 @@ function sanitizeHtml(html, options, _recursing) {
+       }
+       addedText = false;
+     }
+-  }, options.parser);
++  };
++
++  let emittingHandler = {
++    onopentag: function(name, attribs) {
++      if(options.emitter) {
++        options.emitter.start(name, attribs);
++      }
++      handler.onopentag(name, attribs);
++      //console.log(`<${name} ${attribs}>`);
++    },
++    ontext: function(text) {
++      if(options.emitter) {
++        options.emitter.rcdata(text);
++      }
++      handler.ontext(text);
++      // console.log(`text: ${text}`);
++    },
++    onclosetag: function(name) {
++      if(options.emitter) {
++        options.emitter.end(name);
++      }
++      handler.onclosetag(name);
++    },
++    oncomment: function(data) {
++      if(options.emitter) {
++        options.emitter.comment(data);
++      }
++      //console.log(`<!-- ${data} -->`);
++    },
++    oncdatastart: function () {
++      //console.log(`<?CDATA[`);
++    },
++    oncdataend: function () {
++      //console.log(`]]>`);
++    },
++    onprocessinginstruction: function(name, data) {
++      //console.log(`PI: ${name} -> ${data}`);
++    }
++  }
++  const parser = new htmlparser.Parser(emittingHandler, options.parser);
+   parser.write(html);
+   parser.end();
+ 

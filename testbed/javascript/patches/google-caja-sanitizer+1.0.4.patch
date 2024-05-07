@@ -1,0 +1,97 @@
+diff --git a/node_modules/google-caja-sanitizer/sanitizer.js b/node_modules/google-caja-sanitizer/sanitizer.js
+index bf8ff98..ad9dcc9 100644
+--- a/node_modules/google-caja-sanitizer/sanitizer.js
++++ b/node_modules/google-caja-sanitizer/sanitizer.js
+@@ -4509,7 +4509,7 @@ var html = (function(html4) {
+    * @return {function(string, Array)} A function that sanitizes a string of
+    *     HTML and appends result strings to the second argument, an array.
+    */
+-  function makeHtmlSanitizer(tagPolicy) {
++  function makeHtmlSanitizer(tagPolicy, emitter) {
+     var stack;
+     var ignoring;
+     var emit = function (text, out) {
+@@ -4521,6 +4521,7 @@ var html = (function(html4) {
+         ignoring = false;
+       },
+       'startTag': function(tagNameOrig, attribs, out) {
++        emitter.start(tagNameOrig, attribs);
+         if (ignoring) { return; }
+         if (!html4.ELEMENTS.hasOwnProperty(tagNameOrig)) { return; }
+         var eflagsOrig = html4.ELEMENTS[tagNameOrig];
+@@ -4559,6 +4560,7 @@ var html = (function(html4) {
+           var onStack = stack[stack.length - 1];
+           if (onStack && onStack.orig === tagNameOrig &&
+               (onStack.rep !== tagNameRep || tagNameOrig !== tagNameRep)) {
++                emitter.end(onStack.rep);
+                 out.push('<\/', onStack.rep, '>');
+           }
+         }
+@@ -4581,9 +4583,13 @@ var html = (function(html4) {
+             && !(eflagsRep & html4.eflags['EMPTY'])) {
+           // replacement is non-empty, synthesize end tag
+           out.push('<\/', tagNameRep, '>');
++          emitter.end(tagNameRep);
++        } else if (eflagsOrig & html4.eflags['EMPTY']) {
++          emitter.end(tagNameOrig);
+         }
+       },
+       'endTag': function(tagName, out) {
++        emitter.end(tagName);
+         if (ignoring) {
+           ignoring = false;
+           return;
+@@ -4622,11 +4628,24 @@ var html = (function(html4) {
+           out.push('<\/', tagName, '>');
+         }
+       },
+-      'pcdata': emit,
+-      'rcdata': emit,
+-      'cdata': emit,
++      'comment': function(text, out) {
++        emitter.comment(text);
++      },
++      'pcdata': function(text, out) {
++        emitter.pcdata(text);
++        emit(text, out);
++      },
++      'rcdata': function(text, out) {
++        emitter.rcdata(text);
++        emit(text, out);
++      },
++      'cdata': function(text, out) {
++        emitter.cdata(text);
++        emit(text, out);
++      },
+       'endDoc': function(out) {
+         for (; stack.length; stack.length--) {
++          emitter.end(stack[stack.length - 1].rep);
+           out.push('<\/', stack[stack.length - 1].rep, '>');
+         }
+       }
+@@ -4882,9 +4901,9 @@ var html = (function(html4) {
+    *     makeHtmlSanitizer above for details).
+    * @return {string} The sanitized HTML.
+    */
+-  function sanitizeWithPolicy(inputHtml, tagPolicy) {
++  function sanitizeWithPolicy(inputHtml, tagPolicy, emitter) {
+     var outputArray = [];
+-    makeHtmlSanitizer(tagPolicy)(inputHtml, outputArray);
++    makeHtmlSanitizer(tagPolicy, emitter)(inputHtml, outputArray);
+     return outputArray.join('');
+   }
+ 
+@@ -4897,11 +4916,11 @@ var html = (function(html4) {
+    *     to attributes containing HTML names, element IDs, and space-separated
+    *     lists of classes.  If not given, such attributes are left unchanged.
+    */
+-  function sanitize(inputHtml,
++  function sanitize(inputHtml, emitter,
+     opt_naiveUriRewriter, opt_nmTokenPolicy, opt_logger) {
+     var tagPolicy = makeTagPolicy(
+       opt_naiveUriRewriter, opt_nmTokenPolicy, opt_logger);
+-    return sanitizeWithPolicy(inputHtml, tagPolicy);
++    return sanitizeWithPolicy(inputHtml, tagPolicy, emitter);
+   }
+ 
+   // Export both quoted and unquoted names for Closure linkage.

@@ -1,0 +1,29 @@
+{
+  "name": "mxss_testbed",
+  "version": "0.0.1",
+  "description": "",
+  "main": "pw-locally.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "dompurify": "^2.3.10",
+    "dompurify-curr": "npm:dompurify@^3.0.3",
+    "google-caja-sanitizer": "^1.0.4",
+    "jsdom": "^19.0.0",
+    "jsdom20": "npm:jsdom@^20.0.0",
+    "jsdom22": "npm:jsdom@^22.1.0",
+    "minimist": "^1.2.0",
+    "mysql2": "^2.3.3",
+    "patch-package": "^6.4.7",
+    "pg": "^8.7.3",
+    "playwright": "^1.33.0",
+    "sanitize-html": "2.7.0",
+    "sanitizehtml-curr": "npm:sanitize-html@2.11.0",
+    "sanitizer": "^0.1.3"
+  }
+}

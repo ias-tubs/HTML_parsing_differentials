@@ -1,0 +1,97 @@
+diff --git a/node_modules/sanitizer/sanitizer.js b/node_modules/sanitizer/sanitizer.js
+index 73f89b6..9911bfb 100644
+--- a/node_modules/sanitizer/sanitizer.js
++++ b/node_modules/sanitizer/sanitizer.js
+@@ -680,7 +680,7 @@ var html = (function(html4) {
+      * @return {function(string, Array)} A function that sanitizes a string of
+      *     HTML and appends result strings to the second argument, an array.
+      */
+-    function makeHtmlSanitizer(tagPolicy) {
++    function makeHtmlSanitizer(tagPolicy, emitter) {
+         var stack;
+         var ignoring;
+         var emit = function (text, out) {
+@@ -692,6 +692,7 @@ var html = (function(html4) {
+                 ignoring = false;
+             },
+             'startTag': function(tagNameOrig, attribs, out) {
++                emitter.start(tagNameOrig, attribs);
+                 if (ignoring) { return; }
+                 if (!html4.ELEMENTS.hasOwnProperty(tagNameOrig)) { return; }
+                 var eflagsOrig = html4.ELEMENTS[tagNameOrig];
+@@ -730,6 +731,7 @@ var html = (function(html4) {
+                     var onStack = stack[stack.length - 1];
+                     if (onStack && onStack.orig === tagNameOrig &&
+                         (onStack.rep !== tagNameRep || tagNameOrig !== tagNameRep)) {
++                        emitter.end(onStack.rep);
+                         out.push('<\/', onStack.rep, '>');
+                     }
+                 }
+@@ -752,9 +754,13 @@ var html = (function(html4) {
+                     && !(eflagsRep & html4.eflags['EMPTY'])) {
+                     // replacement is non-empty, synthesize end tag
+                     out.push('<\/', tagNameRep, '>');
++                    emitter.end(tagNameRep);
++                } else if (eflagsOrig & html4.eflags['EMPTY']) {
++                    emitter.end(tagNameOrig);
+                 }
+             },
+             'endTag': function(tagName, out) {
++                emitter.end(tagName);
+                 if (ignoring) {
+                     ignoring = false;
+                     return;
+@@ -793,11 +799,24 @@ var html = (function(html4) {
+                     out.push('<\/', tagName, '>');
+                 }
+             },
+-            'pcdata': emit,
+-            'rcdata': emit,
+-            'cdata': emit,
++            'comment': function(text, out) {
++                emitter.comment(text);
++            },
++            'pcdata': function(text, out) {
++                emitter.pcdata(text);
++                emit(text, out);
++            },
++            'rcdata': function(text, out) {
++                emitter.rcdata(text);
++                emit(text, out);
++            },
++            'cdata': function(text, out) {
++                emitter.cdata(text);
++                emit(text, out);
++            },
+             'endDoc': function(out) {
+                 for (; stack.length; stack.length--) {
++                    emitter.end(stack[stack.length - 1].rep);
+                     out.push('<\/', stack[stack.length - 1].rep, '>');
+                 }
+             }
+@@ -1038,9 +1057,9 @@ var html = (function(html4) {
+      *     makeHtmlSanitizer above for details).
+      * @return {string} The sanitized HTML.
+      */
+-    function sanitizeWithPolicy(inputHtml, tagPolicy) {
++    function sanitizeWithPolicy(inputHtml, tagPolicy, emitter) {
+         var outputArray = [];
+-        makeHtmlSanitizer(tagPolicy)(inputHtml, outputArray);
++        makeHtmlSanitizer(tagPolicy, emitter)(inputHtml, outputArray);
+         return outputArray.join('');
+     }
+ 
+@@ -1053,11 +1072,11 @@ var html = (function(html4) {
+      *     to attributes containing HTML names, element IDs, and space-separated
+      *     lists of classes.  If not given, such attributes are left unchanged.
+      */
+-    function sanitize(inputHtml,
++    function sanitize(inputHtml, emitter,
+         opt_naiveUriRewriter, opt_nmTokenPolicy, opt_logger) {
+         var tagPolicy = makeTagPolicy(
+             opt_naiveUriRewriter, opt_nmTokenPolicy, opt_logger);
+-        return sanitizeWithPolicy(inputHtml, tagPolicy);
++        return sanitizeWithPolicy(inputHtml, tagPolicy, emitter);
+     }
+ 
+     // Export both quoted and unquoted names for Closure linkage.
