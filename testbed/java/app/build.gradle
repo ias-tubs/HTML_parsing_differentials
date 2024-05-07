@@ -1,0 +1,35 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+compileJava {
+    options.encoding = "UTF-8"
+}
+compileTestJava {options.encoding = "UTF-8"}
+dependencies {
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'org.owasp.antisamy:antisamy:1.7.3'
+    implementation 'org.postgresql:postgresql:42.4.0'
+    implementation 'info.picocli:picocli:4.6.3'
+}
+
+
+application {
+    mainClass = 'mxss.Testing'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'mxss.App'
+        )
+    }
+    duplicatesStrategy = 'exclude'
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
