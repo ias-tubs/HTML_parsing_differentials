@@ -114,58 +114,6 @@ services:
       WAIT_HOSTS: database:5432
     deploy:
       replicas: 0
-  sanitize-typo3-fix:
-    image: mxssy_php_fix_sanitize
-    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
-  sanitize-typo3-fix-lax:
-    image: mxssy_php_fix_sanitize
-    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix-lax"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
-  sanitize-typo3-fix2:
-    image: mxssy_php_fix2_sanitize
-    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix2"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
-  sanitize-typo3-fix2-lax:
-    image: mxssy_php_fix2_sanitize
-    command: sh -c "/wait && /usr/bin/php /work/run.php --sanitizer=typo3-fix2-lax"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
   sanitize-dompurify:
     image: mxssy_sanitize
     command: sh -c "/wait && /usr/local/bin/node sanitize.js --sanitizer=dompurify"
@@ -322,48 +270,9 @@ services:
       WAIT_HOSTS: database:5432
     deploy:
       replicas: 0
-  sanitize-dotnet-ganss-fix:
-    image: mxssy_dotnet_sanitize
-    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer ganss-fix"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
-  sanitize-dotnet-ganss-fix-lax:
-    image: mxssy_dotnet_sanitize
-    command: sh -c "/wait && /source/bin/Release/net6.0/linux-x64/mxssy --sanitizer ganss-fix-lax"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
   sanitize-ruby-sanitize:
     image: mxssy_ruby_sanitize
     command: sh -c "/wait && /usr/local/bin/ruby run.rb --sanitizer=ruby-sanitize"
-    restart: always
-    depends_on:
-      - database
-    environment:
-      WAIT_LOGGER_LEVEL: error
-      WAIT_BEFORE: 60
-      WAIT_AFTER: 15
-      WAIT_HOSTS: database:5432
-    deploy:
-      replicas: 0
-  sanitize-ruby-sanitize-relaxed:
-    image: mxssy_ruby_sanitize
-    command: sh -c "/wait && /usr/local/bin/ruby run.rb --sanitizer=ruby-sanitize-relaxed"
     restart: always
     depends_on:
       - database
