@@ -1,0 +1,6 @@
+(tests
+ (names util mutated tags tokenize dom_parser metrics clobbering)
+ (modes native)
+ (libraries mxssy containers alcotest tokenizer test_data)
+ (preprocess
+  (pps ppx_deriving.show)))

@@ -1,0 +1,30 @@
+(ocamllex
+ (modules lexer))
+
+(menhir
+ (modules parser)
+ (flags --dump-resolved --comment))
+
+(library
+ (name mxssy)
+ (libraries
+  containers
+  containers-data
+  caqti
+  caqti-driver-postgresql
+  caqti.blocking
+  caqti-lwt
+  otoml
+  fmt
+  tokenizer
+  lwt
+  ptime
+  ptime.clock.os
+  mtime
+  mtime.clock.os)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (instrumentation
+  (backend landmarks --auto)))

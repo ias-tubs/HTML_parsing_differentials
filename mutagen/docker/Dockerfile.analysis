@@ -1,0 +1,20 @@
+from ocaml/opam:debian-10-ocaml-5.0 as mxssy_gen
+
+USER root
+RUN  apt-get update \
+      && apt-get install -y  gcc pkg-config postgresql-client libpq-dev \
+      && rm -rf /var/lib/apt/lists/*
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
+RUN chmod +x /wait
+USER opam
+WORKDIR /home/opam
+RUN mkdir -p /home/opam/data
+
+RUN opam install dune containers containers-data ppx_deriving_hash menhir ppx_yojson_conv.v0.15.1 mtime ptime cmdliner caqti odoc caqti-driver-postgresql alcotest otoml fmt uutf menhir lwt caqti-lwt landmarks-ppx
+
+COPY --chown=opam . /home/opam/mxssy
+
+WORKDIR /home/opam/mxssy
+
+RUN eval $(opam env) && make build
+CMD /wait && /home/opam/mxssy/run_analysis.sh

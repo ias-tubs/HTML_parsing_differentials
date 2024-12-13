@@ -1,0 +1,17 @@
+(executable
+ (public_name minimizer)
+ (name minimize)
+ (modules minimize)
+ (libraries mxssy containers cmdliner))
+
+(executable
+ (public_name generate)
+ (name main)
+ (modules main)
+ (libraries mxssy containers cmdliner))
+
+(executable
+ (public_name local)
+ (name local)
+ (modules local)
+ (libraries mxssy tokenizer containers cmdliner))

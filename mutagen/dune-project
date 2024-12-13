@@ -1,0 +1,29 @@
+(lang dune 2.9)
+(using menhir 2.1)
+(name mxssy)
+(generate_opam_files true)
+(authors "leen@whereismymind.info")
+(maintainers "leen@whereismymind.info")
+(package
+ (name mxssy)
+ (depends
+    (ocaml (>= 5.0))
+    ppx_deriving
+    menhir
+    ppx_deriving_hash
+    ppx_yojson_conv
+    containers
+    ptime
+    mtime
+    cmdliner
+    caqti
+    caqti-lwt
+    caqti-driver-postgresql
+    lwt
+    otoml
+    fmt
+    uutf
+    alcotest
+    landmarks-ppx
+  )
+)

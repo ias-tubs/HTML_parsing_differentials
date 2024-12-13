@@ -1,0 +1,6 @@
+(executable
+ (public_name compare)
+ (name main)
+ (libraries mxssy cmdliner containers fmt)
+ (preprocess
+  (pps ppx_deriving.show ppx_deriving.eq ppx_deriving_hash)))

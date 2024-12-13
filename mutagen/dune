@@ -1,0 +1,4 @@
+(env
+ (dev
+  (flags
+   (:standard -w +A-44-70-32-4-66))))

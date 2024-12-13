@@ -1,0 +1,16 @@
+(library
+ (name tokenizer)
+ (wrapped true)
+ (libraries uutf)
+ (private_modules
+  Encoding
+  Entities
+  Error
+  Html_tokenizer
+  Input
+  Kstream
+  Stream_io
+  Text
+  Trie)
+ (flags
+  (:standard -w -9 -w -68)))

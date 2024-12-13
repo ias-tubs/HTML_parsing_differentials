@@ -1,0 +1,107 @@
+(executable
+ (public_name sanitizer_analysis)
+ (name sanitizer)
+ (modules sanitizer)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name browser_analysis)
+ (name browser)
+ (modules browser)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name mangled_all)
+ (name mangled_all)
+ (modules mangled_all)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name mangled)
+ (name mangled)
+ (modules mangled)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name dom_clobbering_differentials)
+ (name dom_clobbering_differentials)
+ (modules dom_clobbering_differentials)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name dom_clobbering)
+ (name dom_clobbering)
+ (modules dom_clobbering)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name compare_browsers)
+ (name compare_browsers)
+ (modules compare_browsers)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt landmarks)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name compare_reference)
+ (name compare_reference)
+ (modules compare_reference)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))
+
+(executable
+ (public_name diverging_execs)
+ (name diverging)
+ (modules diverging)
+ (flags (-g))
+ (ocamlopt_flags (-O3))
+ (preprocess
+  (pps ppx_deriving_hash ppx_deriving.show ppx_deriving.eq ppx_yojson_conv))
+ (libraries mxssy containers cmdliner lwt)
+ (instrumentation
+  (backend landmarks --auto)))

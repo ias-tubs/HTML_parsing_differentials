@@ -1,0 +1,6 @@
+(executable
+ (public_name mxssy)
+ (name main)
+ (libraries mxssy containers)
+ (preprocess
+  (pps ppx_deriving.show)))

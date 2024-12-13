@@ -1,0 +1,5 @@
+[settings]
+
+[settings.database]
+hostname="database"
+port=5432
